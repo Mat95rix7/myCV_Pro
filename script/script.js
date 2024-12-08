@@ -200,3 +200,14 @@ document.getElementById('contactForm').addEventListener('submit', function (even
         bubble.remove();
     }, 3500);
 });
+
+function setProgress(circleId, percentage) {
+    const circle = document.getElementById(circleId);
+    const circumference = 2 * Math.PI * 50; // 2 * π * r
+    const offset = circumference - (percentage / 100) * circumference;
+    circle.style.strokeDashoffset = offset;
+}
+
+setProgress("circle-french", 90);
+setProgress("circle-english", 60);
+setProgress("circle-arabic", 100);
