@@ -8,7 +8,7 @@ document.getElementById('contactForm').addEventListener('submit', function(event
 
 
 // Animation de défilement fluide
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+document.querySelectorAll('a[href="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
         e.preventDefault();
         document.querySelector(this.getAttribute('href')).scrollIntoView({
@@ -208,6 +208,67 @@ function setProgress(circleId, percentage) {
     circle.style.strokeDashoffset = offset;
 }
 
-setProgress("circle-french", 90);
+setProgress("circle-french", 100);
 setProgress("circle-english", 60);
 setProgress("circle-arabic", 100);
+
+document.getElementById('downloadBtn').addEventListener('click', () => {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    let yOffset = 20; // Position verticale initiale
+
+    // Fonction pour ajouter du texte au PDF avec gestion automatique de la ligne suivante
+    const addText = (text, yOffset) => {
+        const lineHeight = 10;
+        const maxWidth = 180;
+        const lines = doc.splitTextToSize(text, maxWidth);
+        doc.text(lines, 20, yOffset);
+        return yOffset + (lines.length * lineHeight);
+    };
+
+    // Titre principal
+    doc.setFontSize(22);
+    doc.text('Mon CV Interactif', 20, yOffset);
+    yOffset += 15;
+
+    // Slogan
+    const slogan = document.querySelector('header p').textContent;
+    doc.setFontSize(14);
+    yOffset = addText(`Slogan : ${slogan}`, yOffset + 10);
+
+    // À propos
+    const about = document.querySelector('#about p').textContent;
+    doc.setFontSize(16);
+    doc.text('À propos :', 20, yOffset += 10);
+    doc.setFontSize(12);
+    yOffset = addText(about, yOffset + 5);
+
+    // Compétences
+    const skills = document.querySelectorAll('#skills .mb-3');
+    doc.setFontSize(16);
+    doc.text('Compétences :', 20, yOffset += 10);
+    doc.setFontSize(12);
+    skills.forEach(skill => {
+        const skillName = skill.querySelector('span').textContent;
+        const progress = skill.querySelector('.progress-bar').getAttribute('data-width');
+        yOffset = addText(`${skillName} : ${progress}`, yOffset + 5);
+    });
+
+    // Expérience
+    const experienceItems = document.querySelectorAll('#experience li');
+    doc.setFontSize(16);
+    doc.text('Expérience :', 20, yOffset += 10);
+    doc.setFontSize(12);
+    experienceItems.forEach(item => {
+        yOffset = addText(item.textContent, yOffset + 5);
+    });
+
+    // Contact
+    doc.setFontSize(16);
+    doc.text('Contact :', 20, yOffset += 10);
+    const email = "votre.email@example.com"; // Remplacez par une récupération dynamique si nécessaire
+    yOffset = addText(`Email : ${email}`, yOffset + 5);
+
+    // Sauvegarder le PDF
+    doc.save('cv_interactif.pdf');
+});
